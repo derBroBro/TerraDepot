@@ -31,11 +31,11 @@ resource "aws_api_gateway_integration" "integration" {
   uri                     = aws_lambda_function.lambda.invoke_arn
 }
 
-resource "aws_api_gateway_deployment" "test" {
+resource "aws_api_gateway_deployment" "prod" {
   depends_on = [
     "aws_api_gateway_integration.integration"
   ]
 
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
-  stage_name  = "test"
+  stage_name  = "prod"
 }
