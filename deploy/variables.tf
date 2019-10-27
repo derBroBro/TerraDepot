@@ -4,3 +4,11 @@ variable "region" {
 
 variable "name" {
 }
+
+variable "domain"{
+  default = ""
+}
+
+variable "cert_arn"{
+  default = ""
+}

@@ -39,3 +39,15 @@ resource "aws_api_gateway_deployment" "prod" {
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
   stage_name  = "prod"
 }
+
+resource "aws_api_gateway_domain_name" "main" {
+  domain_name = var.domain
+  certificate_arn = var.cert_arn
+  count = (var.domain != "" ? 1 : 0)
+}
+
+resource "aws_api_gateway_base_path_mapping" "prod" {
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  stage_name  = "${aws_api_gateway_deployment.prod.stage_name}"
+  domain_name = "${aws_api_gateway_domain_name.main.0.domain_name}"
+}

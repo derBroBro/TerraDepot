@@ -26,6 +26,10 @@ terraform apply
 ```
 > You must provide a name for the project. This will be used for the functions, IAM user and the bucket. For this it must be **unique**!
 
+### Using a cust domains
+Using custom domains is quite easy, just pass in the `domain` and `cert_arn` variables.
+The `cert_arn` must be a verfied ACM certificate in the us-east-1 region.
+
 ## For each project
 Add a file named *backend.tf* with the following content:
 ```hcl
@@ -44,9 +48,12 @@ There are a lot of extensions possible for this backend.
 Just some ideas:  
 - [ ] Trigger a central webhook for each state-change  
 - [ ] List and show all states on a central place  
+- [ ] Central locking
+- [ ] Cost warnings
+- [ ] Secrutiy checks
 
 # Todo
 - [ ] Setup proper testing
-- [ ] Add custom Urls
+- [x] Add custom Domains
 
 
