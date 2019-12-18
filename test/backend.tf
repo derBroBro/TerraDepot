@@ -1,5 +1,5 @@
 terraform {
-  backend "http" {
-    address = "https://czrqnde1f7.execute-api.eu-central-1.amazonaws.com/test/project/malte?key=1234"
-  }
+backend "http" {
+    address = "https://yourdoma.in/project/ck8rspe7tkVvlOLXxV8t9RBVPGGxBeBoaTWaM85YEobrsnln/terraform.tfstate"
+}
 }

@@ -2,13 +2,6 @@
     "version": 3,
     "serial": 0,
     "lineage": "2f9e63c7-4b6b-4c17-bd0e-662816c7a32f",
-    "backend": {
-        "type": "http",
-        "config": {
-            "address": "http://localhost:5000/project/test"
-        },
-        "hash": 8051317947656340736
-    },
     "modules": [
         {
             "path": [

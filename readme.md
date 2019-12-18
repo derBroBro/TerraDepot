@@ -11,7 +11,8 @@ And yes - you are right the is something similar but also different as this appr
 - If you want to do it right, you have to handle two AWS credentials which the same time (for tf and the backend)  
 
 ## Idea behind this approach
-You set up the backend ONCE for your organization. Afterward, everyone can set up the backend in terraform just by adding a unique URL and a self-defined key. If the project is already there the access will just be allowed if you have the right key provided. If the project is new, the set key will be stored and is mandatory for further operations
+You set up the backend ONCE for your organization. Afterward, everyone can set up the backend for terraform by his own.  
+By to so, a new uniqe ID will be created which can be used. Currently the ID is an random alpha numerical key. 
 All data is persisted in one bucket incl. versioning.  
 
 To use it an HTTP endpoint is provided which you can add to your terraform project. 
@@ -24,30 +25,22 @@ git clone https://github.com/derBroBro/terraform-http-backend.git
 cd terraform-http-backend/deploy
 terraform apply
 ```
-> You must provide a name for the project. This will be used for the functions, IAM user and the bucket. For this it must be **unique**!
+> You must provide a name for the project. This will be used for the functions, IAM user and the bucket.
 
 ### Using a cust domains
 Using custom domains is quite easy, just pass in the `domain` and `cert_arn` variables.
 The `cert_arn` must be a verfied ACM certificate in the us-east-1 region.
+After this you need to create a CNAME Record for your domain pointing to the API Gateways Endpoint. Details what to configure will be shown in the outputs.
 
 ## For each project
-Add a file named *backend.tf* with the following content:
-```hcl
-terraform {
-  backend "http" {
-    address = "https://YourUrlHere/test/project/YourProjectNameHere?key=YourKeyHere"
-  }
-}
-```
-The key should be removed from the repo and be provided elsewhere. 
-> The key is setup on the first use. If you want to change it, modify the *config.json* within the bucket.
-
+Visit your https://yourdomain/project/new to create a new project.  
+This page will give you a new terraform backend_http.tf file to add to your project.
 
 # Further opportunities
 There are a lot of extensions possible for this backend.
 Just some ideas:  
 - [ ] Trigger a central webhook for each state-change  
-- [ ] List and show all states on a central place  
+- [ ] List and show all states on a central place (/status for examplle)  
 - [ ] Central locking
 - [ ] Cost warnings
 - [ ] Secrutiy checks

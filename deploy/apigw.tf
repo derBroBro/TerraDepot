@@ -12,32 +12,69 @@ resource "aws_api_gateway_resource" "project_id" {
   parent_id   = aws_api_gateway_resource.project.id
   path_part   = "{projectId}"
 }
+resource "aws_api_gateway_resource" "project_state" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_resource.project_id.id
+  path_part   = "terraform.tfstate"
+}
+resource "aws_api_gateway_resource" "project_new" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_resource.project.id
+  path_part   = "new"
+}
 
-resource "aws_api_gateway_method" "method" {
+resource "aws_api_gateway_method" "method_state" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.project_id.id
+  resource_id   = aws_api_gateway_resource.project_state.id
   http_method   = "ANY"
   authorization = "NONE"
   request_parameters = {
     "method.request.path.proxy" = true
   }
 }
-resource "aws_api_gateway_integration" "integration" {
+resource "aws_api_gateway_method" "method_new" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.project_new.id
+  http_method   = "ANY"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "integration_state" {
   rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_resource.project_id.id
-  http_method = aws_api_gateway_method.method.http_method
+  resource_id = aws_api_gateway_resource.project_state.id
+  http_method = aws_api_gateway_method.method_state.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda.invoke_arn
+  uri                     = aws_lambda_function.lambda_state.invoke_arn
 }
+
+resource "aws_api_gateway_integration" "integration_new" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.project_new.id
+  http_method = aws_api_gateway_method.method_new.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambda_new.invoke_arn
+}
+
 
 resource "aws_api_gateway_deployment" "prod" {
   depends_on = [
-    "aws_api_gateway_integration.integration"
+    "aws_api_gateway_integration.integration_state",
+    "aws_api_gateway_integration.integration_new"
   ]
 
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = "prod"
+  variables   = {
+    deployed_at = "${timestamp()}"
+  }
+  lifecycle {
+    create_before_destroy = true
+  } 
 }
 
 resource "aws_api_gateway_domain_name" "main" {
