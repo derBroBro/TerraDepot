@@ -57,11 +57,11 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "s3_access" {
-  role       = "${aws_iam_role.lambda_exec.name}"
-  policy_arn = "${aws_iam_policy.s3_policy.arn}"
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.s3_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "logging_access" {
-  role       = "${aws_iam_role.lambda_exec.name}"
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
