@@ -1,11 +1,14 @@
-import json
 import logging
 import os
-from lib import create_response, randomString, write_key, read_key_or_default
+import json
+from jinja2 import Template
+from lib import create_response, read_key_or_default, read_file
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
 
+INFO = read_file("templates/project_info.html")
+INFO_TEMPLATE = Template(INFO)
 
 def lambda_handler(event, context):
     project_id = event["pathParameters"]["projectId"]    
@@ -25,19 +28,9 @@ def lambda_handler(event, context):
     # Get existing state or create new
     if event['httpMethod'] == "GET":
         logger.info("Type is GET, send state")
-        data = read_key_or_default(statefile)
-        if data == None:
+        config = json.loads(read_key_or_default(configfile))
+        if config == None:
             return create_response(f"No project exists, please visit {self_url}/project/new")
         else:
-            return create_response(data.decode('utf-8'))
-        
-    # update
-    if event['httpMethod'] == "POST":
-        logger.info("Type is POST, save and send state")
-        data = read_key_or_default(configfile)
-        if data == None:
-            return create_response(f"No project exists, please visit {self_url}/project/new")
-        else:
-            data = event["body"]
-            write_key(statefile,data)
-            return create_response(data)
+            output = INFO_TEMPLATE.render(name=config["name"])
+            return create_response(output,contenttype="text/html")

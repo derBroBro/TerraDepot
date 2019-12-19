@@ -23,7 +23,13 @@
         <div class="row">
             <div class="col-md-12">
                 Please create a file <code>backend_http.tf</code> in your project with the following content:<br>
-                <pre class="bg-dark text-light"><code>###STATE###</code></pre>
+                <pre class="bg-dark text-light"><code>{% raw %}
+terraform {
+    backend "http" { {% endraw %}
+        address = "https://{{domain}}/project/{{id}}/terraform.tfstate"{% raw %}
+    }
+}{% endraw %}
+                </code></pre>
             </div>
         </div>
     </div>

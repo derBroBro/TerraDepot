@@ -5,8 +5,6 @@ resource "aws_lambda_permission" "apigw_lambda_state" {
   function_name = aws_lambda_function.lambda_state.function_name
   principal     = "apigateway.amazonaws.com"
 
-  # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
-  # source_arn = "arn:aws:execute-api:${var.region}:${var.accountId}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.method.http_method}${aws_api_gateway_resource.resource.path}"
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
 }
 resource "aws_lambda_permission" "apigw_lambda_new" {
@@ -15,15 +13,36 @@ resource "aws_lambda_permission" "apigw_lambda_new" {
   function_name = aws_lambda_function.lambda_new.function_name
   principal     = "apigateway.amazonaws.com"
 
-  # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
-  # source_arn = "arn:aws:execute-api:${var.region}:${var.accountId}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.method.http_method}${aws_api_gateway_resource.resource.path}"
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
 }
- 
+resource "aws_lambda_permission" "apigw_lambda_info" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_info.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
+}
+  
+resource "null_resource" "pip_install" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    md52 = "${filemd5("../code/requirements.txt")}"
+  }
+
+  provisioner "local-exec" {
+    # Bootstrap script called with private_ip of each node in the clutser
+    command = "pip install --target ../code/ -r ../code/requirements.txt"
+  }
+}
+
 data "archive_file" "deploy_pkg" {
   type        = "zip"
   source_dir  = "${path.module}/../code/"
   output_path = "${path.module}/deploy_pkg.zip"
+  depends_on  = [
+    "null_resource.pip_install"
+  ]
 }
 
 
@@ -49,6 +68,23 @@ resource "aws_lambda_function" "lambda_new" {
   function_name = "${var.name}_new"
   role          = aws_iam_role.lambda_exec.arn
   handler       = "new.lambda_handler"
+  runtime       = "python3.6"
+  source_code_hash = data.archive_file.deploy_pkg.output_base64sha256
+
+  environment {
+    variables = {
+      S3_BUCKET = aws_s3_bucket.state_bucket.id
+      DOMAIN    = var.domain
+      LOG_LEVEL = "INFO"
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_info" {
+  filename      = "deploy_pkg.zip"
+  function_name = "${var.name}_info"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "info.lambda_handler"
   runtime       = "python3.6"
   source_code_hash = data.archive_file.deploy_pkg.output_base64sha256
 
