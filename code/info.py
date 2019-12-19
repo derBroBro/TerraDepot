@@ -2,13 +2,15 @@ import logging
 import os
 import json
 from jinja2 import Template
-from lib import create_response, read_key_or_default, read_file
+from lib import create_response, read_key_or_default, read_file, get_tf_res, get_tf_metadata
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
 
 INFO = read_file("templates/project_info.html")
 INFO_TEMPLATE = Template(INFO)
+DOMAIN = os.environ.get('DOMAIN')
+
 
 def lambda_handler(event, context):
     project_id = event["pathParameters"]["projectId"]    
@@ -29,8 +31,11 @@ def lambda_handler(event, context):
     if event['httpMethod'] == "GET":
         logger.info("Type is GET, send state")
         config = json.loads(read_key_or_default(configfile))
+        state = json.loads(read_key_or_default(statefile))
         if config == None:
             return create_response(f"No project exists, please visit {self_url}/project/new")
         else:
-            output = INFO_TEMPLATE.render(name=config["name"])
+            metadata = get_tf_metadata(state)
+            resources = get_tf_res(state)
+            output = INFO_TEMPLATE.render(config=config, metadata=metadata, resources=resources, project_id=project_id, domain=DOMAIN )
             return create_response(output,contenttype="text/html")

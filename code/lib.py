@@ -25,7 +25,15 @@ def create_response(body, code=200, contenttype="application/json"):
             "Content-Type": contenttype,
         }
     }
-
+def redirect(url):
+    logger.info(f"Redirect to {url}")
+    return {
+        "statusCode": 301,
+        "body": "body",
+        "headers": {
+            "Location": url,
+        }
+    }
 def write_key(filename, data):
     logger.info(f"write file {filename} to {BUCKET}")
     s3_obj = s3_client.Object(BUCKET, filename)
@@ -46,5 +54,42 @@ def read_file(filename):
     with open(filename, "r") as file:
         return file.read()
 
-def get_tf_res():
-    pass
+def get_tf_res(tf_state):
+    result = []
+    resources = tf_state["resources"]
+    for res in resources:
+        if res["mode"] == "managed":
+            name = res["name"]
+
+            if "module" in res:
+                mod = res["module"]
+                res["id"] = f"{mod}.{name}"
+            else:
+                res["id"] = name    
+                
+            # example for costs
+            if res["type"] == "aws_nat_gateway":
+                res["costs"] = "36"
+            if res["type"] == "aws_kms_key":
+                res["costs"] = "1"
+            result.append(res)
+
+    return result
+
+def get_tf_metadata(tf_state):
+    version = 0
+    terraform_version = 0
+    serial = 0
+
+    if "version" in tf_state:
+        version = tf_state["version"]
+    if "terraform_version" in tf_state:
+        terraform_version = tf_state["terraform_version"]
+    if "serial" in tf_state:
+        serial = tf_state["serial"]
+
+    return {
+        "version": version,
+        "terraform_version": terraform_version,
+        "serial": serial
+    }

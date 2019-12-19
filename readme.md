@@ -34,16 +34,16 @@ After this you need to create a CNAME Record for your domain pointing to the API
 
 ## For each project
 Visit your https://yourdomain/project/new to create a new project.  
-This page will give you a new terraform backend_http.tf file to add to your project.
+After creation you will get to the overview of your project. On this you find also an `backend_http.tf` config which should be added to your projects.
 
 # Further opportunities
 There are a lot of extensions possible for this backend.
 Just some ideas:  
 - [ ] Trigger a central webhook for each state-change  
-- [ ] List and show all states on a central place (/status for examplle)  
+- [x] List and show all states on a central place 
 - [ ] Central locking
-- [ ] Cost warnings
-- [ ] Secrutiy checks
+- [ ] Cost warnings (base is set, example code available)
+- [ ] Security checks
 
 # Todo
 - [ ] Setup proper testing

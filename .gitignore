@@ -4,3 +4,11 @@ terraform.tfstate.backup
 .terraform
 .tfvars
 .vscode
+
+terraform.tfvars
+code/Jinja2*
+code/jinja2*
+code/markupsafe*
+code/MarkupSafe*
+code/__pycache__*
+code/test.py

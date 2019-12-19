@@ -17,14 +17,37 @@
     <div class="container">
             <div class="row">
                     <div class="col-md-12">
-                        <h1>Details for project {{name}}</h1>
+                        <h1>Project {{config.name}} <small class="text-muted">Owner {{config.owner}}</small></h1>
+                        Terraform Serial is {{metadata.serial}}<br>
+                        The raw state can be found <a href="https://{{domain}}/project/{{project_id}}/terraform.tfstate">here</a>
                     </div>
                 </div>
         <div class="row">
             <div class="col-md-12">
-
+                <h4>Resources</h4>
+                <ul class="list-group">
+                {% for resource in resources %}
+                    <li class="list-group-item">{{ resource.id }} <b>{{resource.type}}</b>
+                        {% if resource.costs %}
+                        <span class="badge badge-secondary">&#126;{{resource.costs}} USD</span></li>
+                        {% endif %}
+                  {% endfor %}
+                </ul>
             </div>
         </div>
+        <div class="row">
+                <div class="col-md-12">
+                    <h4>Usage</h4>
+                    <pre class="bg-dark text-light"><code>{% raw %}
+terraform {
+    backend "http" { {% endraw %}
+        address = "https://{{domain}}/project/{{project_id}}/terraform.tfstate"{% raw %}
+    }
+}{% endraw %}
+                 </code></pre>
+                </div>
+            </div>
+
     </div>
     </div>
     <!-- Optional JavaScript -->
