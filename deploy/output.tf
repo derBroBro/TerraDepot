@@ -3,5 +3,5 @@ output "settings"{
 }
 
 output "instructions"{
-    value = "You create can create you first project here https://${var.domain}/project/new"
+    value = "You create can create you first project here https://${var.domain}/project/new?key=${var.auth_key}"
 }

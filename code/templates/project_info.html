@@ -10,46 +10,69 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <title>Create a new Terraform backend</title>
+    <title>Project {{config.name}}</title>
 </head>
 
 <body>
-    <div class="container">
-            <div class="row">
+        <div class="container">
+                <div class="row mt-5">
                     <div class="col-md-12">
-                        <h1>Project {{config.name}} <small class="text-muted">Owner {{config.owner}}</small></h1>
-                        Terraform Serial is {{metadata.serial}}<br>
-                        The raw state can be found <a href="https://{{domain}}/project/{{project_id}}/terraform.tfstate">here</a>
+                            <p class="text-right"><a href="/project/new?key=replaceme">New Project</a></p>
+                        <h1>Project {{config.name}}</h1>
+
                     </div>
                 </div>
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Resources</h4>
-                <ul class="list-group">
-                {% for resource in resources %}
-                    <li class="list-group-item">{{ resource.id }} <b>{{resource.type}}</b>
-                        {% if resource.costs %}
-                        <span class="badge badge-secondary">&#126;{{resource.costs}} USD</span></li>
-                        {% endif %}
-                  {% endfor %}
-                </ul>
-            </div>
-        </div>
-        <div class="row">
-                <div class="col-md-12">
-                    <h4>Usage</h4>
-                    <pre class="bg-dark text-light"><code>{% raw %}
-terraform {
+                <div class="row mt-1">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <h5 class="card-header">General</h5>
+                            <div class="card-body">                                  
+                                Terraform Serial: {{metadata.serial}}<br>
+                                Owner: {{config.owner}}<br>
+                                The raw state can be found <a href="https://{{domain}}/project/{{project_id}}/terraform.tfstate">here</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <h5 class="card-header">Resources</h5>
+                                <div class="card-body">                                  
+                                    <ul class="list-group">
+                                    {% for resource in resources %}
+                                        <li class="list-group-item">{{ resource.id }} <b>{{resource.type}}</b>
+                                            {% if resource.costs %}
+                                            <span class="badge badge-secondary">&#126;{{resource.costs}} USD</span></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <h5 class="card-header">Usage</h5>
+                                    <div class="card-body">                                  
+                                        <pre class="bg-dark text-light">
+                                            <code>
+{% raw %}terraform {
     backend "http" { {% endraw %}
         address = "https://{{domain}}/project/{{project_id}}/terraform.tfstate"{% raw %}
     }
 }{% endraw %}
-                 </code></pre>
-                </div>
+                                            </code>
+                                        </pre>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        &copy; 2019 Malte Brodersen - Find more on <a href="https://github.com/derBroBro/terraform-http-backend">github</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
             </div>
-
-    </div>
-    </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"

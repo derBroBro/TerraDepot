@@ -2,17 +2,30 @@ import json
 import logging
 import os
 import urllib.parse
+from jinja2 import Template
 from lib import create_response, randomString, write_key, read_file,redirect
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
 
 DOMAIN = os.environ.get('DOMAIN')
+KEY = os.environ.get('KEY')
 
 DEFAULT_STATE = read_file("templates/default.tfstate.template")
 PROJECT_FORM = read_file("templates/project_form.html")
 
-def lambda_handler(event, context):    
+
+def lambda_handler(event, context):
+    # check preshared key, can be replaced to an API authenticator
+    sended_key = "INVALID"
+    print(event)
+    if  event["queryStringParameters"] == None or not "key" in event["queryStringParameters"]:
+        return create_response("Not key provided, please at it to the url",contenttype="text/html", code=401)
+    sended_key = event["queryStringParameters"]["key"]
+    if sended_key != KEY:
+        return create_response("Invalid key sended",contenttype="text/html", code=401)
+
+
     # Get existing state or create new
     if event['httpMethod'] == "GET":
         logger.info(f"Send form for creation")

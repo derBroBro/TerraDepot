@@ -12,3 +12,6 @@ variable "domain"{
 variable "cert_arn"{
   default = ""
 }
+variable "auth_key"{
+  default = "r3pl4c3m3"
+}

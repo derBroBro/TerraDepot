@@ -75,6 +75,7 @@ resource "aws_lambda_function" "lambda_new" {
     variables = {
       S3_BUCKET = aws_s3_bucket.state_bucket.id
       DOMAIN    = var.domain
+      KEY       = var.auth_key
       LOG_LEVEL = "INFO"
     }
   }
