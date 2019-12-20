@@ -1,11 +1,11 @@
 *.zip
-terraform.tfstate
-terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
 .terraform
 .tfvars
 .vscode
+*.tfvars
 
-terraform.tfvars
 code/Jinja2*
 code/jinja2*
 code/markupsafe*
