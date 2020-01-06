@@ -4,6 +4,7 @@ import logging
 import boto3
 import botocore
 import os
+from lib_costs import get_costs
 
 logger = logging.getLogger()
 
@@ -67,11 +68,9 @@ def get_tf_res(tf_state):
             else:
                 res["id"] = name    
                 
-            # example for costs
-            if res["type"] == "aws_nat_gateway":
-                res["costs"] = "36"
-            if res["type"] == "aws_kms_key":
-                res["costs"] = "1"
+            # get costs
+            res["costs"] = get_costs(res)
+
             result.append(res)
 
     return result

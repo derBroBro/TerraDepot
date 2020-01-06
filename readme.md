@@ -46,7 +46,7 @@ Just some ideas:
 - [ ] Trigger a central webhook for each state-change  
 - [x] List and show all states on a central place 
 - [ ] Central locking
-- [ ] Cost warnings (base is set, example code available)
+- [ ] Cost warnings (base is set, next a lot of completion. [lyft/awspricing](https://github.com/lyft/awspricing) my helpfull)
 - [ ] Security checks
 
 # Todo
