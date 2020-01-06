@@ -5,6 +5,7 @@ import boto3
 import botocore
 import os
 from lib_costs import get_costs
+from lib_security import get_security
 
 logger = logging.getLogger()
 
@@ -70,6 +71,7 @@ def get_tf_res(tf_state):
                 
             # get costs
             res["costs"] = get_costs(res)
+            res["security"] = get_security(res)
 
             result.append(res)
 

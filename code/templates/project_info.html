@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <title>Project {{config.name}}</title>
 </head>
 
@@ -38,15 +40,53 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <h5 class="card-header">Resources</h5>
-                                <div class="card-body">                                  
-                                    <ul class="list-group">
-                                    {% for resource in resources %}
-                                        <li class="list-group-item">{{ resource.id }} <b>{{resource.type}}</b>
-                                            {% if resource.costs %}
-                                            <span class="badge badge-secondary">&#126;{{resource.costs}} USD</span></li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
+                                <div class="card-body"> 
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                <th scope="col">Mobule</th>
+                                                <th scope="col">Type</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Costs</th>
+                                                <th scope="col">Security</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for resource in resources %}
+                                                <tr>
+                                                    <td scope="row">{{resource.module}}</td>
+                                                    <td>
+                                                        {{resource.type}}
+                                                    </td>
+                                                    <td>
+                                                        {{ resource.name }}
+                                                    </td>
+                                                    <td>
+                                                        {% if resource.costs %}
+                                                            {{resource.costs}} USD
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if resource.security == -1 %}
+                                                            <i class="fa fa-question-circle text-muted"></i>
+                                                        {% endif %}
+                                                        {% if resource.security == 0 %}
+                                                            <i class="fa fa-times-circle text-success"></i>
+                                                        {% endif %}
+                                                        {% if resource.security == 1 %}
+                                                            <i class="fa fa-exclamation-triangle text-warning"></i>
+                                                        {% endif %}
+                                                        {% if resource.security == 2 %}
+                                                            <i class="fa fa-times-circle text-danger"></i>
+                                                        {% endif %}
+                                                        {% if resource.security == 3 %}
+                                                            <i class="fa fa-question-circle text-dark"></i>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>    
                                 </div>
                             </div>
                         </div>
