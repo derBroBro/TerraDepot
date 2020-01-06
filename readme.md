@@ -20,7 +20,7 @@ To use it an HTTP endpoint is provided which you can add to your terraform proje
 Behind all data (tfstate and config) is stored in a bucket in a folder named after the project id. 
 
 # DEMO
-A demo installation can be found [here](https://terraform.exoit.de/project/new?key=r3pl4c3m3).
+A demo installation can be found [here](https://terraform.exoit.de/project/new) (admin/r3pl4c3m3).
 
 # Setup
 ## Deploy the server-side
@@ -51,7 +51,7 @@ Just some ideas:
 
 # Todo
 - [ ] Setup proper testing
-- [ ] Setup basis auth instead of the key-based
+- [x] Setup basis auth instead of the key-based
 - [x] Add custom Domains
 
 

@@ -37,5 +37,5 @@ def lambda_handler(event, context):
         else:
             metadata = get_tf_metadata(state)
             resources = get_tf_res(state)
-            output = INFO_TEMPLATE.render(config=config, metadata=metadata, resources=resources, project_id=project_id, domain=DOMAIN )
+            output = INFO_TEMPLATE.render(config=config, metadata=metadata, resources=resources, project_id=project_id, domain=DOMAIN, token=config["token"] )
             return create_response(output,contenttype="text/html")

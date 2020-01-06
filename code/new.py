@@ -16,15 +16,6 @@ PROJECT_FORM = read_file("templates/project_form.html")
 
 
 def lambda_handler(event, context):
-    # check preshared key, can be replaced to an API authenticator
-    sended_key = "INVALID"
-    print(event)
-    if  event["queryStringParameters"] == None or not "key" in event["queryStringParameters"]:
-        return create_response("Not key provided, please at it to the url",contenttype="text/html", code=401)
-    sended_key = event["queryStringParameters"]["key"]
-    if sended_key != KEY:
-        return create_response("Invalid key sended",contenttype="text/html", code=401)
-
 
     # Get existing state or create new
     if event['httpMethod'] == "GET":
@@ -42,13 +33,15 @@ def lambda_handler(event, context):
         logger.info(body_vars)
         logger.info("name" in body_vars)
         logger.info("owner" in body_vars)
-        if not ("name" in body_vars and "owner" in body_vars):
-            return create_response("Missing field owner or name",code=500)
+        logger.info("token" in body_vars)
+        if not ("name" in body_vars and "owner" in body_vars and "token" in body_vars):
+            return create_response("Missing field owner, name or token",code=500)
 
         name = body_vars["name"]
         owner = body_vars["owner"]
+        token = body_vars["token"]
         project_id = randomString(48)
-        config = json.dumps({"name":name, "owner":owner})
+        config = json.dumps({"name":name, "owner":owner, "token":token})
 
         logger.info(f"Create project {name} with id {project_id}")
         

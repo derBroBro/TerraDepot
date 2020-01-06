@@ -59,8 +59,10 @@
                                         <pre class="bg-dark text-light">
                                             <code>
 {% raw %}terraform {
-    backend "http" { {% endraw %}
-        address = "https://{{domain}}/project/{{project_id}}/terraform.tfstate"{% raw %}
+    backend "http" {{% endraw %}
+        address = "https://{{domain}}/project/{{project_id}}/terraform.tfstate"
+        username = "token"
+        password = "{{token}}"{% raw %}
     }
 }{% endraw %}
                                             </code>

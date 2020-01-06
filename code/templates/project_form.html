@@ -27,7 +27,10 @@
                                 <label for="owner">Owner</label>
                                 <input type="email" class="form-control" id="owner" name="owner" required>
                             </div>
-                            <input type="hidden" name="key" value={key}>
+                            <div class="form-group">
+                                <label for="token">API Token</label>
+                                <input type="password" class="form-control" id="token" name="token" required>
+                            </div>
 
                             <input class="btn btn-primary" type="submit" value="Create">
                         </form>
