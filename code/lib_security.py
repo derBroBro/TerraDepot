@@ -3,11 +3,11 @@ def get_security(resource):
     # 0 ok
     # 1 warning
     # 2 critical
-    # 4 empty (missing ressource)
+    # 3 empty (missing ressource)
     if resource["type"] == "aws_s3_bucket":
         if len(resource["instances"]) == 0:
-            return 4
-            
+            return 3
+
         for i in resource["instances"]:
             if len(i["attributes"]["logging"]) == 0:
                 return 2
