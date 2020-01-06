@@ -99,7 +99,9 @@ resource "aws_api_gateway_integration" "integration_info" {
 resource "aws_api_gateway_deployment" "prod" {
   depends_on = [
     "aws_api_gateway_integration.integration_state",
-    "aws_api_gateway_integration.integration_new"
+    "aws_api_gateway_integration.integration_info",
+    "aws_api_gateway_integration.integration_new",
+    "aws_api_gateway_authorizer.auth"
   ]
 
   rest_api_id = aws_api_gateway_rest_api.api.id
