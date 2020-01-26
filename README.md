@@ -63,11 +63,15 @@ Just some ideas:
 - [x] List and show all states on a central place 
 - [ ] Central state locking
 - [ ] Cost warnings (base is set. Baybe [lyft/awspricing](https://github.com/lyft/awspricing) is helpfull)
-- [ ] Security checks
+- [ ] Security checks (public buckets etc.)
+- [ ] Pen-Test after state changes
+- [ ] Send a brief summary as a notification
 
 # Todo
 - [ ] Setup proper testing
 - [x] Setup basis auth instead of the key-based
 - [x] Add custom Domains
+- [ ] Add SNS to subscribe on changes
+- [ ] Generate report asynchronously (Required for notifications and pentests) 
 
 
