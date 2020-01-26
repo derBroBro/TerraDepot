@@ -61,6 +61,13 @@ class test_get_tf_res(unittest.TestCase):
         tf_res = get_tf_res(tf_state)
         self.assertEqual(len(tf_res),1)
         self.assertEqual(tf_res[0]["id"], "test-res")
+    def test_res_raw(self):
+        tf_raw_state = read_file("test_data/terraform.teststate")
+        tf_res = get_tf_res(tf_raw_state, True)
+        self.assertEqual(len(tf_res),1)
+    def test_res_raw_invalid(self):
+        tf_res = get_tf_res("SOME_TEXT", True)
+        self.assertEqual(len(tf_res),0)
 
 class test_get_tf_metadata(unittest.TestCase):
     def test_res(self):
@@ -70,6 +77,17 @@ class test_get_tf_metadata(unittest.TestCase):
         self.assertEqual(tf_meta["version"],4)
         self.assertEqual(tf_meta["terraform_version"],"0.12.9")
         self.assertEqual(tf_meta["serial"], 360)
+    def test_res_raw(self):
+        tf_raw_state = read_file("test_data/terraform.teststate")
+        tf_meta = get_tf_metadata(tf_raw_state, True)
+        self.assertEqual(tf_meta["version"],4)
+        self.assertEqual(tf_meta["terraform_version"],"0.12.9")
+        self.assertEqual(tf_meta["serial"], 360)
+    def test_res_raw_invalid(self):
+        tf_meta = get_tf_metadata("SOME_TEXT", True)
+        self.assertEqual(tf_meta["version"],-1)
+        self.assertEqual(tf_meta["terraform_version"],"invalid")
+        self.assertEqual(tf_meta["serial"], -1)
 
 class test_get_post_parameter(unittest.TestCase):
     def test_parse(self):

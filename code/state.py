@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from lib import create_response, randomString, write_key, read_key_or_default, get_config
+from lib import create_response, write_key, read_key_or_default, get_config, get_tf_metadata
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
@@ -12,11 +12,11 @@ def lambda_handler(event, context):
     logger.info(f"Got request for project {project_id}")
 
     statefile = f"{project_id}/terraform.tfstate"
+    self_url = "https://" + event["requestContext"]["domainName"]
 
     config = get_config(project_id)    
     if config["name"] == "invalid":
-        self_url = "https://" + event["requestContext"]["domainName"]
-        return create_response(f"No project exists, please visit {self_url}/project/new")
+        return create_response(f"No project exists, please visit {self_url}/project/new",404)
 
     project_name = config["name"]
     logger.info(f"Got request for {project_name} with id {project_id}")
@@ -31,5 +31,9 @@ def lambda_handler(event, context):
     if event['httpMethod'] == "POST":
         logger.info("Type is POST, save and send state")
         data = event["body"]
-        write_key(statefile,data)
-        return create_response(data)
+        metadata = get_tf_metadata(data, True)
+        if metadata["terraform_version"] == "invalid":
+            return  create_response("Unable to parse", code=500)
+        else:
+            write_key(statefile,data)
+            return create_response(data)

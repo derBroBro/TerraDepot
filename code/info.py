@@ -17,21 +17,21 @@ def lambda_handler(event, context):
     logger.info(f"Got request for project {project_id}")
 
     statefile = f"{project_id}/terraform.tfstate"
+    self_url = "https://" + event["requestContext"]["domainName"]
 
-    
-    config = get_config(project_id)
+    config = get_config(project_id)    
+    if config["name"] == "invalid":
+        return create_response(f"No project exists, please visit {self_url}/project/new", 404)
+
     project_name = config["name"]
     logger.info(f"Got request for {project_name} with id {project_id}")
-
-
-    self_url = "https://" + event["requestContext"]["domainName"]
 
     # Get existing state or create new
     if event['httpMethod'] == "GET":
         logger.info("Type is GET, send state")
         state = json.loads(read_key_or_default(statefile))
         if config == None:
-            return create_response(f"No project exists, please visit {self_url}/project/new")
+            return create_response(f"No project exists, please visit {self_url}/project/new", code=404)
         else:
             metadata = get_tf_metadata(state)
             resources = get_tf_res(state)

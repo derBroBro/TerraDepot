@@ -19,12 +19,12 @@ class test_lambda_handler(unittest.TestCase):
         event = {"httpMethod":"GET","pathParameters":{"projectId":project_id}, "requestContext":{"domainName":"test.local"}}
         result = lambda_handler(event, {})
         self.assertEqual(result["statusCode"], 200)
-        self.assertTrue(result["body"].startswith("<html"))
+        self.assertTrue(result["body"].startswith("<!doctype"))
 
     def test_request_get_na(self):
         event = {"httpMethod":"GET","pathParameters":{"projectId":"notexistingproject"}, "requestContext":{"domainName":"test.local"}}
         result = lambda_handler(event, {})
-        self.assertEqual(result["statusCode"], 200)
+        self.assertEqual(result["statusCode"], 404)
         self.assertTrue(result["body"].startswith("No "))
 
 

@@ -62,7 +62,12 @@ def read_file(filename):
     with open(filename, "r") as file:
         return file.read()
 
-def get_tf_res(tf_state):
+def get_tf_res(tf_state, is_raw=False):
+    if is_raw:
+        try:
+            tf_state = json.loads(tf_state)
+        except:
+            return []
     result = []
     resources = tf_state["resources"]
     for res in resources:
@@ -83,7 +88,13 @@ def get_tf_res(tf_state):
 
     return result
 
-def get_tf_metadata(tf_state):
+def get_tf_metadata(tf_state, is_raw=False):
+    if is_raw:
+        try:
+            tf_state = json.loads(tf_state)
+        except:
+            return {"version":-1, "terraform_version": "invalid", "serial": -1}
+
     version = 0
     terraform_version = 0
     serial = 0
