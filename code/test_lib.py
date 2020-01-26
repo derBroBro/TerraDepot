@@ -6,7 +6,7 @@ from moto import mock_s3
 from helpers import setup_s3
 setup_s3()
 
-from lib import randomString, create_response, redirect, write_key, read_key_or_default, read_file, get_tf_res, get_tf_metadata
+from lib import randomString, create_response, redirect, write_key, read_key_or_default, read_file, get_tf_res, get_tf_metadata, get_post_parameter, new_project, get_config
 
 class test_randomString(unittest.TestCase):
     def test_len(self):
@@ -70,3 +70,30 @@ class test_get_tf_metadata(unittest.TestCase):
         self.assertEqual(tf_meta["version"],4)
         self.assertEqual(tf_meta["terraform_version"],"0.12.9")
         self.assertEqual(tf_meta["serial"], 360)
+
+class test_get_post_parameter(unittest.TestCase):
+    def test_parse(self):
+        params = get_post_parameter({"body":"name=test&owner=test%40test.de&token=sometoken"})
+        print(params)
+        self.assertEqual(params["name"],"test")
+        self.assertEqual(params["owner"],"test@test.de")
+        self.assertEqual(params["token"], "sometoken")
+
+@mock_s3
+class test_new_project(unittest.TestCase):
+    def test_create(self):
+        project_id = new_project(name="test", owner="test@test.de", token="elkaj3dlka3jdla3jd")
+        raw_tf = read_key_or_default(f"{project_id}/terraform.tfstate","EMPTY")
+        config = get_config(project_id)
+        self.assertTrue(raw_tf.startswith(b"{"))
+        self.assertEqual(config["name"],"test")
+
+@mock_s3
+class test_get_config(unittest.TestCase):
+    def test_load(self):
+        project_id = new_project(name="test", owner="test@test.de", token="elkaj3dlka3jdla3jd")
+        config = get_config(project_id)
+        self.assertEqual(config["name"], "test")
+    def test_load_invalid(self):
+        config = get_config("notexistingid")
+        self.assertEqual(config["name"], "invalid")

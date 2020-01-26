@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import base64
-from lib import create_response, randomString, write_key, read_key_or_default
+from lib import create_response, randomString, write_key, read_key_or_default, get_config
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
@@ -43,8 +43,7 @@ def lambda_handler(event, context):
         if auth_user == "token":
             project_id = event["pathParameters"]["projectId"]    
             logger.info(f"Got request for project {project_id}")
-            configfile = f"{project_id}/config.json"
-            config = json.loads(read_key_or_default(configfile))
+            config = get_config(project_id)
             project_name = config["name"]
             project_token = config["token"]
             logger.info(f"Got request for {project_name} with id {project_id}")

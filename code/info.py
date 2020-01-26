@@ -2,7 +2,7 @@ import logging
 import os
 import json
 from jinja2 import Template
-from lib import create_response, read_key_or_default, read_file, get_tf_res, get_tf_metadata
+from lib import create_response, read_key_or_default, read_file, get_tf_res, get_tf_metadata, get_config
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
@@ -16,11 +16,10 @@ def lambda_handler(event, context):
     project_id = event["pathParameters"]["projectId"]    
     logger.info(f"Got request for project {project_id}")
 
-    configfile = f"{project_id}/config.json"
     statefile = f"{project_id}/terraform.tfstate"
 
     
-    config = json.loads(read_key_or_default(configfile))
+    config = get_config(project_id)
     project_name = config["name"]
     logger.info(f"Got request for {project_name} with id {project_id}")
 
@@ -30,7 +29,6 @@ def lambda_handler(event, context):
     # Get existing state or create new
     if event['httpMethod'] == "GET":
         logger.info("Type is GET, send state")
-        config = json.loads(read_key_or_default(configfile))
         state = json.loads(read_key_or_default(statefile))
         if config == None:
             return create_response(f"No project exists, please visit {self_url}/project/new")

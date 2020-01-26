@@ -7,7 +7,7 @@ from helpers import setup_s3
 setup_s3()
 
 from new import lambda_handler
-from lib import read_key_or_default
+from lib import read_key_or_default, get_config
 
 @mock_s3
 class test_lambda_handler(unittest.TestCase):
@@ -18,7 +18,7 @@ class test_lambda_handler(unittest.TestCase):
         project_id  = result["headers"]["Location"].split("/")[-2]
         state = json.loads(read_key_or_default(f"{project_id}/terraform.tfstate","NA"))
         self.assertEqual(state["serial"],0)
-        config = json.loads(read_key_or_default(f"{project_id}/config.json","NA"))
+        config = get_config(project_id)
         self.assertEqual(config["name"],"test")
     def test_request_post_incomplete(self):
         event = {"httpMethod":"POST", "body":"name=test&token=test"}

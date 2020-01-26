@@ -4,12 +4,16 @@ import logging
 import boto3
 import botocore
 import os
+import json
+import urllib.parse
 from lib_costs import get_costs
 from lib_security import get_security
 
 logger = logging.getLogger()
 
 BUCKET = os.environ.get('S3_BUCKET')
+DEFAULT_STATE = "templates/default.tfstate.template"
+
 s3_client = boto3.resource('s3')
 
 def randomString(stringLength=10):
@@ -96,3 +100,34 @@ def get_tf_metadata(tf_state):
         "terraform_version": terraform_version,
         "serial": serial
     }
+
+def get_post_parameter(event):
+    body_vars = {}
+    if not "body" in event:
+        return body_vars
+    
+    body = urllib.parse.unquote(event["body"])
+    for line in body.split("&"):
+        line_data = line.split("=")
+        body_vars[line_data[0]]=line_data[1]
+    return body_vars
+
+def new_project(name, owner, token):
+    project_id = randomString(48)
+    config = json.dumps({"name":name, "owner":owner, "token":token})
+    state = read_file(DEFAULT_STATE)
+
+    logger.info(f"Create project {name} with id {project_id}")
+        
+    write_key(f"{project_id}/config.json",config)
+    write_key(f"{project_id}/terraform.tfstate",state)
+
+    return project_id
+
+def get_config(project_id):
+    raw_data = read_key_or_default(f"{project_id}/config.json", "{\"name\":\"invalid\",\"token\":\"invalid\",\"owner\":\"invalid\"}")
+    return json.loads(raw_data)
+        
+
+
+    
