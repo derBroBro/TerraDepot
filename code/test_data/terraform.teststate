@@ -1,0 +1,38 @@
+{
+  "version": 4,
+  "terraform_version": "0.12.9",
+  "serial": 360,
+  "lineage": "95558cd1-1b8d-9a52-cc1b-c060f6d0d5dc",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_api_gateway_authorizer",
+      "name": "test-res",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "authorizer_credentials": "arn:aws:iam::123456789900:role/terraform-state-server-auth",
+            "authorizer_result_ttl_in_seconds": 0,
+            "authorizer_uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:123456789900:function:terraform-state-server_auth/invocations",
+            "id": "dorhpj",
+            "identity_source": "method.request.header.Authorization",
+            "identity_validation_expression": "",
+            "name": "test-res",
+            "provider_arns": [],
+            "rest_api_id": "128o9xhgjj",
+            "type": "REQUEST"
+          },
+          "private": "bnVsbA==",
+          "depends_on": [
+            "aws_api_gateway_rest_api.api",
+            "aws_iam_role.auth",
+            "aws_lambda_function.lambda_auth"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -50,6 +50,8 @@ def read_key_or_default(filename, default_value=None):
     # make nicer and chat execption
     except botocore.exceptions.ClientError as e:
         logger.warn(f"No file yet, send default value ({default_value})")
+        if not default_value == None:
+            default_value = default_value.encode("UTF8")
         return default_value
 
 def read_file(filename):

@@ -12,3 +12,6 @@ code/markupsafe*
 code/MarkupSafe*
 code/__pycache__*
 code/test.py
+code/.pytest_cache
+code/.coverage
+code/htmlcov

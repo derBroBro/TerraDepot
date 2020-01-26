@@ -15,29 +15,27 @@ def lambda_handler(event, context):
     statefile = f"{project_id}/terraform.tfstate"
 
     
-    config = json.loads(read_key_or_default(configfile))
+    raw_config = read_key_or_default(configfile)
+    if raw_config == None:
+        self_url = "https://" + event["requestContext"]["domainName"]
+        return create_response(f"No project exists, please visit {self_url}/project/new")
+
+    config = json.loads(raw_config)
     project_name = config["name"]
     logger.info(f"Got request for {project_name} with id {project_id}")
 
 
-    self_url = "https://" + event["requestContext"]["domainName"]
 
     # Get existing state or create new
     if event['httpMethod'] == "GET":
         logger.info("Type is GET, send state")
         data = read_key_or_default(statefile)
-        if data == None:
-            return create_response(f"No project exists, please visit {self_url}/project/new")
-        else:
-            return create_response(data.decode('utf-8'))
+        return create_response(data.decode('utf-8'))
         
     # update
     if event['httpMethod'] == "POST":
         logger.info("Type is POST, save and send state")
         data = read_key_or_default(configfile)
-        if data == None:
-            return create_response(f"No project exists, please visit {self_url}/project/new")
-        else:
-            data = event["body"]
-            write_key(statefile,data)
-            return create_response(data)
+        data = event["body"]
+        write_key(statefile,data)
+        return create_response(data)

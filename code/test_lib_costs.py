@@ -24,6 +24,14 @@ class test_get_costs(unittest.TestCase):
         res = {"type":"aws_kms_key"}
         costs = get_costs(res)
         self.assertEqual(costs, 1)
+    def test_nat(self):
+        res = {"type":"aws_nat_gateway"}
+        costs = get_costs(res)
+        self.assertGreater(costs, 1)
+    def test_undefined(self):
+        res = {"type":"nothing_existing"}
+        costs = get_costs(res)
+        self.assertEqual(costs, None)
 
 if __name__ == '__main__':
     unittest.main()

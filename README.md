@@ -68,7 +68,7 @@ Just some ideas:
 - [ ] Send a brief summary as a notification
 
 # Todo
-- [ ] Setup proper testing
+- [x] Setup proper testing
 - [x] Setup basis auth instead of the key-based
 - [x] Add custom Domains
 - [ ] Add SNS to subscribe on changes
