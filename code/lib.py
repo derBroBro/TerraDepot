@@ -3,6 +3,7 @@ import string
 import logging
 import boto3
 import botocore
+from jinja2 import Template
 import os
 import json
 import urllib.parse
@@ -13,6 +14,7 @@ logger = logging.getLogger()
 
 BUCKET = os.environ.get('S3_BUCKET')
 DEFAULT_STATE = "templates/default.tfstate.template"
+VERSION = "1.0.0"
 
 s3_client = boto3.resource('s3')
 
@@ -120,7 +122,8 @@ def get_post_parameter(event):
     body = urllib.parse.unquote(event["body"])
     for line in body.split("&"):
         line_data = line.split("=")
-        body_vars[line_data[0]]=line_data[1]
+        if len(line_data) == 2: 
+            body_vars[line_data[0]]=line_data[1]
     return body_vars
 
 def new_project(name, owner, token):
@@ -139,6 +142,13 @@ def get_config(project_id):
     raw_data = read_key_or_default(f"{project_id}/config.json", "{\"name\":\"invalid\",\"token\":\"invalid\",\"owner\":\"invalid\"}")
     return json.loads(raw_data)
         
+def render_template(template_file, **kwargs):
+    raw_template = read_file("templates/project_form.html")
+    template = Template(raw_template)
+    result = template.render( kwargs, verion=VERSION )
+    return result
+
+
 
 
     

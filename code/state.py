@@ -36,4 +36,5 @@ def lambda_handler(event, context):
             return  create_response("Unable to parse", code=500)
         else:
             write_key(statefile,data)
+            # todo: write the terraform.tfstate.serial
             return create_response(data)

@@ -2,13 +2,12 @@ import logging
 import os
 import json
 from jinja2 import Template
-from lib import create_response, read_key_or_default, read_file, get_tf_res, get_tf_metadata, get_config
+from lib import create_response, read_key_or_default, read_file, get_tf_res, get_tf_metadata, get_config, render_template
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
 
-INFO = read_file("templates/project_info.html")
-INFO_TEMPLATE = Template(INFO)
+TEMPLATE_FILE = "templates/project_info.html"
 DOMAIN = os.environ.get('DOMAIN')
 
 
@@ -35,5 +34,5 @@ def lambda_handler(event, context):
         else:
             metadata = get_tf_metadata(state)
             resources = get_tf_res(state)
-            output = INFO_TEMPLATE.render(config=config, metadata=metadata, resources=resources, project_id=project_id, domain=DOMAIN, token=config["token"] )
+            output = render_template(template_file=TEMPLATE_FILE, config=config, metadata=metadata, resources=resources, project_id=project_id, domain=DOMAIN, token=config["token"] )
             return create_response(output,contenttype="text/html")
