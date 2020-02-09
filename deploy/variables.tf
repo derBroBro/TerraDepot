@@ -5,13 +5,13 @@ variable "region" {
 variable "name" {
 }
 
-variable "domain"{
+variable "domain" {
   default = ""
 }
 
-variable "cert_arn"{
+variable "cert_arn" {
   default = ""
 }
-variable "auth_key"{
+variable "auth_key" {
   default = "r3pl4c3m3"
 }

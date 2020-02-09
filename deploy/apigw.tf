@@ -2,8 +2,8 @@
 
 ## Rest API
 resource "aws_api_gateway_rest_api" "api" {
- name = var.name
- description = "Proxy to handle requests to our API"
+  name        = var.name
+  description = "Proxy to handle requests to our API"
 }
 
 ## Ressources
@@ -35,9 +35,9 @@ resource "aws_api_gateway_resource" "project_new" {
 
 ## Methodes
 resource "aws_api_gateway_method" "method_state" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.project_state.id
-  http_method   = "ANY"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.project_state.id
+  http_method = "ANY"
   request_parameters = {
     "method.request.path.proxy" = true
   }
@@ -46,9 +46,9 @@ resource "aws_api_gateway_method" "method_state" {
   authorizer_id = aws_api_gateway_authorizer.auth.id
 }
 resource "aws_api_gateway_method" "method_new" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.project_new.id
-  http_method   = "ANY"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.project_new.id
+  http_method = "ANY"
   request_parameters = {
     "method.request.path.proxy" = true
   }
@@ -57,9 +57,9 @@ resource "aws_api_gateway_method" "method_new" {
   authorizer_id = aws_api_gateway_authorizer.auth.id
 }
 resource "aws_api_gateway_method" "method_info" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.project_info.id
-  http_method   = "ANY"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.project_info.id
+  http_method = "ANY"
   request_parameters = {
     "method.request.path.proxy" = true
   }
@@ -70,25 +70,25 @@ resource "aws_api_gateway_method" "method_info" {
 
 ## Integration
 resource "aws_api_gateway_integration" "integration_state" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_resource.project_state.id
-  http_method = aws_api_gateway_method.method_state.http_method
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.project_state.id
+  http_method             = aws_api_gateway_method.method_state.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_state.invoke_arn
 }
 resource "aws_api_gateway_integration" "integration_new" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_resource.project_new.id
-  http_method = aws_api_gateway_method.method_new.http_method
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.project_new.id
+  http_method             = aws_api_gateway_method.method_new.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_new.invoke_arn
 }
 resource "aws_api_gateway_integration" "integration_info" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_resource.project_info.id
-  http_method = aws_api_gateway_method.method_new.http_method
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.project_info.id
+  http_method             = aws_api_gateway_method.method_new.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_info.invoke_arn
@@ -106,12 +106,12 @@ resource "aws_api_gateway_deployment" "prod" {
 
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = "prod"
-  variables   = {
+  variables = {
     deployed_at = "${timestamp()}"
   }
   lifecycle {
     create_before_destroy = true
-  } 
+  }
 }
 resource "aws_api_gateway_base_path_mapping" "prod" {
   api_id      = aws_api_gateway_rest_api.api.id
@@ -121,19 +121,19 @@ resource "aws_api_gateway_base_path_mapping" "prod" {
 
 ## Custom Domain
 resource "aws_api_gateway_domain_name" "main" {
-  domain_name = var.domain
+  domain_name     = var.domain
   certificate_arn = var.cert_arn
-  count = (var.domain != "" ? 1 : 0)
+  count           = (var.domain != "" ? 1 : 0)
 }
 
 ## Auth
 resource "aws_api_gateway_authorizer" "auth" {
-  name                   = "auth"
-  type                   = "REQUEST"
+  name = "auth"
+  type = "REQUEST"
   #identity_source        = "method.request.header.SomeHeaderName"
-  rest_api_id            = "${aws_api_gateway_rest_api.api.id}"
-  authorizer_uri         = "${aws_lambda_function.lambda_auth.invoke_arn}"
-  authorizer_credentials = "${aws_iam_role.auth.arn}"
+  rest_api_id                      = "${aws_api_gateway_rest_api.api.id}"
+  authorizer_uri                   = "${aws_lambda_function.lambda_auth.invoke_arn}"
+  authorizer_credentials           = "${aws_iam_role.auth.arn}"
   authorizer_result_ttl_in_seconds = 0
 }
 resource "aws_api_gateway_gateway_response" "auth" {
