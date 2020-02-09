@@ -137,6 +137,7 @@ resource "aws_lambda_function" "lambda_report" {
   role          = aws_iam_role.lambda_exec.arn
   handler       = "report.lambda_handler"
   runtime       = "python3.6"
+  timeout       = 120
   source_code_hash = data.archive_file.deploy_pkg.output_base64sha256
 
   environment {
