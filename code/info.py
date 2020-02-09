@@ -15,24 +15,13 @@ def lambda_handler(event, context):
     project_id = event["pathParameters"]["projectId"]    
     logger.info(f"Got request for project {project_id}")
 
-    statefile = f"{project_id}/terraform.tfstate"
-    self_url = "https://" + event["requestContext"]["domainName"]
+    report_path = f"{project_id}/report.json"
 
-    config = get_config(project_id)    
-    if config["name"] == "invalid":
-        return create_response(f"No project exists, please visit {self_url}/project/new", 404)
-
-    project_name = config["name"]
-    logger.info(f"Got request for {project_name} with id {project_id}")
+    report = json.loads(read_key_or_default(report_path,"{}"))
+    if not "metadata" in report:
+        return create_response("No report is available (yet). Please check out in a view seconds.", code=404)
 
     # Get existing state or create new
     if event['httpMethod'] == "GET":
-        logger.info("Type is GET, send state")
-        state = json.loads(read_key_or_default(statefile))
-        if config == None:
-            return create_response(f"No project exists, please visit {self_url}/project/new", code=404)
-        else:
-            metadata = get_tf_metadata(state)
-            resources = get_tf_res(state)
-            output = render_template(template_file=TEMPLATE_FILE, config=config, metadata=metadata, resources=resources, project_id=project_id, domain=DOMAIN, token=config["token"] )
-            return create_response(output,contenttype="text/html")
+        output = render_template(template_file=TEMPLATE_FILE, report=report, project_id=project_id, domain=DOMAIN )
+        return create_response(output,contenttype="text/html")

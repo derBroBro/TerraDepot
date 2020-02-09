@@ -27,6 +27,7 @@ class test_lambda_handler(unittest.TestCase):
     def test_request_get(self):
         event = {"httpMethod":"GET"}
         result = lambda_handler(event, {})
+        print(result["body"])
         self.assertEqual(result["statusCode"], 200)
 
 if __name__ == '__main__':

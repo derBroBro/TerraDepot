@@ -6,7 +6,7 @@ from moto import mock_s3
 from helpers import setup_s3
 setup_s3()
 
-from lib import randomString, create_response, redirect, write_key, read_key_or_default, read_file, get_tf_res, get_tf_metadata, get_post_parameter, new_project, get_config, render_template
+from lib import randomString, create_response, redirect, write_key, read_key_or_default, read_file, get_tf_res, get_tf_metadata, get_post_parameter, new_project, get_config, render_template, gen_report, gen_test_project
 
 class test_randomString(unittest.TestCase):
     def test_len(self):
@@ -60,7 +60,7 @@ class test_get_tf_res(unittest.TestCase):
         tf_state = json.loads(tf_raw_state)
         tf_res = get_tf_res(tf_state)
         self.assertEqual(len(tf_res),1)
-        self.assertEqual(tf_res[0]["id"], "test-res")
+        self.assertEqual(tf_res[0]["id"], "state_bucket")
     def test_res_raw(self):
         tf_raw_state = read_file("test_data/terraform.teststate")
         tf_res = get_tf_res(tf_raw_state, True)
@@ -125,3 +125,21 @@ class test_render_template(unittest.TestCase):
     def test_load(self):
         output = render_template("templates/project_form.html", name="test")
         self.assertTrue(output.startswith("<!doctype"))
+
+@mock_s3
+class test_gen_report(unittest.TestCase):
+    def test_report(self):
+        project_id = gen_test_project()
+        
+        report = gen_report(project_id)
+        report_from_s3 = json.loads(read_key_or_default(f"{project_id}/report.json",""))
+
+        self.assertEqual(report["config"]["name"], "test")
+        self.assertEqual(report_from_s3["config"]["name"], "test")
+
+@mock_s3
+class test_gen_test_project(unittest.TestCase):
+    def test_generated(self):
+        project_id = gen_test_project()
+        config = get_config(project_id)
+        self.assertEqual(config["name"], "test")

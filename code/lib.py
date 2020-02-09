@@ -3,6 +3,7 @@ import string
 import logging
 import boto3
 import botocore
+from datetime import datetime
 from jinja2 import Template
 import os
 import json
@@ -10,13 +11,12 @@ import urllib.parse
 from lib_costs import get_costs
 from lib_security import get_security
 
+
 logger = logging.getLogger()
 
 BUCKET = os.environ.get('S3_BUCKET')
 DEFAULT_STATE = "templates/default.tfstate.template"
 VERSION = "1.0.0"
-
-s3_client = boto3.resource('s3')
 
 def randomString(stringLength=10):
     """Generate a random string of fixed length """
@@ -44,11 +44,13 @@ def redirect(url):
     }
 def write_key(filename, data):
     logger.info(f"write file {filename} to {BUCKET}")
+    s3_client = boto3.resource('s3')
     s3_obj = s3_client.Object(BUCKET, filename)
     s3_obj.put(Body=data) 
 
 def read_key_or_default(filename, default_value=None):
     logger.info(f"read file {filename} to {BUCKET}")
+    s3_client = boto3.resource('s3')
     s3_obj = s3_client.Object(BUCKET, filename)
     try:
         data = s3_obj.get()["Body"].read()
@@ -143,12 +145,39 @@ def get_config(project_id):
     return json.loads(raw_data)
         
 def render_template(template_file, **kwargs):
-    raw_template = read_file("templates/project_form.html")
+    raw_template = read_file(template_file)
     template = Template(raw_template)
     result = template.render( kwargs, verion=VERSION )
     return result
 
+def gen_report(project_id):
+    report = {}
+    report["config"] = get_config(project_id)
+    state = json.loads(read_key_or_default(f"{project_id}/terraform.tfstate","{}"))
+    report["metadata"] = get_tf_metadata(state)
+    report["resources"] = get_tf_res(state)
+    report["last_update"] = datetime.now().isoformat()
+    report["state"] = -1
 
+    # get the worst state
+    for res in report["resources"]:
+        if res["security"]["state"]>report["state"]:
+            report["state"] = res["security"]["state"]
+
+    write_key(f"{project_id}/report.json", json.dumps(report,indent=4))
+    return report
+    
+def send_message(target_arn, message, subject=""):
+    logger.info(f"Send {subject}/{message} to {target_arn}")
+    sns_client = boto3.client('sns')
+    result = sns_client.publish(TopicArn=target_arn, Message=message, Subject=subject)
+    logger.info(result)
+
+def gen_test_project():
+    project_id = new_project(name="test", owner="test@test.de", token="test123")
+    tf_raw_state = read_file("test_data/terraform.teststate")
+    write_key(f"{project_id}/terraform.tfstate",tf_raw_state)
+    return project_id
 
 
     

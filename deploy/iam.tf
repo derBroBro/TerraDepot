@@ -36,6 +36,39 @@ resource "aws_iam_policy" "s3_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "sns_policy" {
+  name        = "${var.name}_sns-access-${var.name}"
+  path        = "/"
+  description = "Access to the ${var.name} sns topics"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": [
+              "${aws_sns_topic.state_updates.arn}",
+              "${aws_sns_topic.config_updates.arn}"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+              "sns:List*",
+              "sns:Get*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_role" "lambda_exec" {
   name = var.name
   
@@ -59,6 +92,11 @@ EOF
 resource "aws_iam_role_policy_attachment" "s3_access" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "sns_access" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.sns_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "logging_access" {

@@ -18,4 +18,6 @@ def get_costs(resource):
     if resource["type"] == "aws_kms_key":
         # 1USD/mon
         return 1.0
+    if resource["type"] == "aws_s3_bucket":
+        return 0.0
     return None

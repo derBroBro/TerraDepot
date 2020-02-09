@@ -33,6 +33,14 @@ resource "aws_lambda_permission" "apigw_lambda_info" {
 
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
 }
+resource "aws_lambda_permission" "s3_lambda_report" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_report.function_name
+  principal     = "s3.amazonaws.com"
+
+  source_arn = aws_s3_bucket.state_bucket.arn
+}
 
 ## zip 
 resource "null_resource" "pip_install" {
@@ -123,4 +131,21 @@ resource "aws_lambda_function" "lambda_info" {
     }
   }
 }
+resource "aws_lambda_function" "lambda_report" {
+  filename      = "deploy_pkg.zip"
+  function_name = "${var.name}_report"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "report.lambda_handler"
+  runtime       = "python3.6"
+  source_code_hash = data.archive_file.deploy_pkg.output_base64sha256
 
+  environment {
+    variables = {
+      S3_BUCKET = aws_s3_bucket.state_bucket.id
+      DOMAIN    = var.domain
+      LOG_LEVEL = "INFO"
+      STATE_TOPIC = aws_sns_topic.state_updates.arn
+      CONFIG_TOPIC = aws_sns_topic.config_updates.arn
+    }
+  }
+}

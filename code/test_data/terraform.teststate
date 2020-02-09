@@ -7,30 +7,52 @@
   "resources": [
     {
       "mode": "managed",
-      "type": "aws_api_gateway_authorizer",
-      "name": "test-res",
+      "type": "aws_s3_bucket",
+      "name": "state_bucket",
       "provider": "provider.aws",
       "instances": [
         {
           "schema_version": 0,
           "attributes": {
-            "authorizer_credentials": "arn:aws:iam::123456789900:role/terraform-state-server-auth",
-            "authorizer_result_ttl_in_seconds": 0,
-            "authorizer_uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:123456789900:function:terraform-state-server_auth/invocations",
-            "id": "dorhpj",
-            "identity_source": "method.request.header.Authorization",
-            "identity_validation_expression": "",
-            "name": "test-res",
-            "provider_arns": [],
-            "rest_api_id": "128o9xhgjj",
-            "type": "REQUEST"
+            "acceleration_status": "",
+            "acl": "private",
+            "arn": "arn:aws:s3:::123456789101-terraform-state-server2",
+            "bucket": "123456789101-terraform-state-server2",
+            "bucket_domain_name": "123456789101-terraform-state-server2.s3.amazonaws.com",
+            "bucket_prefix": null,
+            "bucket_regional_domain_name": "123456789101-terraform-state-server2.s3.eu-central-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "hosted_zone_id": "Z21DNDUVLXXXXX",
+            "id": "123456789101-terraform-state-server2",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "policy": null,
+            "region": "eu-central-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [],
+            "tags": {},
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
           },
           "private": "bnVsbA==",
           "depends_on": [
-            "aws_api_gateway_rest_api.api",
-            "aws_iam_role.auth",
-            "aws_lambda_function.lambda_auth"
+            "data.aws_caller_identity.current"
           ]
+        },
+        {
+          "deposed": "10b8ba20",
+          "schema_version": 0,
+          "attributes": null
         }
       ]
     }

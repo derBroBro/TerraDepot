@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <title>Project {{config.name}}</title>
+    <title>Project {{report.config.name}}</title>
 </head>
 
 <body>
@@ -20,7 +20,7 @@
                 <div class="row mt-5">
                     <div class="col-md-12">
                             <p class="text-right"><a href="/project/new?key=replaceme">New Project</a></p>
-                        <h1>Project {{config.name}}</h1>
+                        <h1>Project {{report.config.name}}</h1>
 
                     </div>
                 </div>
@@ -29,8 +29,22 @@
                         <div class="card">
                             <h5 class="card-header">General</h5>
                             <div class="card-body">                                  
-                                Terraform Serial: {{metadata.serial}}<br>
-                                Owner: {{config.owner}}<br>
+                                Terraform Serial: {{report.metadata.serial}}<br>
+                                Owner: {{report.config.owner}}<br>
+                                Last update: {{report.last_update}}<br>
+                                State: 
+                                    {% if report.state == -1 -%}
+                                        <i class="fa fa-question-circle text-muted"></i>
+                                    {% endif -%}
+                                    {% if report.state == 0 -%}
+                                        <i class="fa fa-times-circle text-success"></i>
+                                    {% endif -%}
+                                    {% if report.state == 1 -%}
+                                        <i class="fa fa-exclamation-triangle text-warning"></i>
+                                    {% endif -%}
+                                    {% if report.state == 2 -%}
+                                        <i class="fa fa-times-circle text-danger"></i>
+                                    {% endif -%}<br>
                                 The raw state can be found <a href="https://{{domain}}/project/{{project_id}}/terraform.tfstate">here</a>
                             </div>
                         </div>
@@ -53,7 +67,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for resource in resources %}
+                                                {% for resource in report.resources %}
                                                 <tr>
                                                     <td scope="row">{{resource.module}}</td>
                                                     <td>
@@ -63,26 +77,26 @@
                                                         {{ resource.name }}
                                                     </td>
                                                     <td>
-                                                        {% if resource.costs %}
+                                                        {% if resource.costs != None %}
                                                             {{resource.costs}} USD
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if resource.security == -1 %}
+                                                        {% if resource.security.state == -1 -%}
                                                             <i class="fa fa-question-circle text-muted"></i>
-                                                        {% endif %}
-                                                        {% if resource.security == 0 %}
+                                                        {% endif -%}
+                                                        {% if resource.security.state == 0 -%}
                                                             <i class="fa fa-times-circle text-success"></i>
-                                                        {% endif %}
-                                                        {% if resource.security == 1 %}
+                                                        {% endif -%}
+                                                        {% if resource.security.state == 1 -%}
                                                             <i class="fa fa-exclamation-triangle text-warning"></i>
-                                                        {% endif %}
-                                                        {% if resource.security == 2 %}
+                                                        {% endif -%}
+                                                        {% if resource.security.state == 2 -%}
                                                             <i class="fa fa-times-circle text-danger"></i>
-                                                        {% endif %}
-                                                        {% if resource.security == 3 %}
-                                                            <i class="fa fa-question-circle text-dark"></i>
-                                                        {% endif %}
+                                                        {% endif -%}
+                                                        {% for test in resource.security.tests -%}
+                                                            {{test.message}}
+                                                        {% endfor -%}
                                                     </td>
                                                 </tr>
                                                 {% endfor %}
@@ -104,7 +118,7 @@
     backend "http" {{% endraw %}
         address = "https://{{domain}}/project/{{project_id}}/terraform.tfstate"
         username = "token"
-        password = "{{token}}"{% raw %}
+        password = "{{report.config.token}}"{% raw %}
     }
 }{% endraw %}
                                             </code>
