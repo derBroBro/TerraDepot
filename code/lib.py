@@ -8,8 +8,8 @@ from jinja2 import Template
 import os
 import json
 import urllib.parse
-from lib_costs import get_costs
-from lib_security import get_security
+import check_security
+import check_costs
 
 
 logger = logging.getLogger()
@@ -85,8 +85,8 @@ def get_tf_res(tf_state, is_raw=False):
                 res["id"] = name    
                 
             # get costs
-            res["costs"] = get_costs(res)
-            res["security"] = get_security(res)
+            res["costs"] = check_costs.run(res)
+            res["security"] = check_security.run(res)
 
             result.append(res)
 

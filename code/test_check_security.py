@@ -1,5 +1,5 @@
 import unittest
-from lib_security import get_security, gen_review, get_test, STATE
+from check_security import run, gen_review, get_test, STATE
 
 class test_gen_review(unittest.TestCase):
     def test_generate(self):
@@ -20,15 +20,19 @@ class test_get_test(unittest.TestCase):
 class test_get_security(unittest.TestCase):
     def test_s3_enabled(self):
         res = {"type":"aws_s3_bucket", "instances":[{"attributes":{"logging":["somebucket"]}}] }
-        sec = get_security(res)
+        sec = run(res)
         self.assertEqual(sec["state"], 0)
     def test_s3_disabled(self):
         res = {"type":"aws_s3_bucket", "instances":[{"attributes":{"logging":[]}}] }
-        sec = get_security(res)
+        sec = run(res)
         self.assertEqual(sec["state"], 2)
     def test_s3_emtpy(self):
         res = {"type":"aws_s3_bucket", "instances":[] }
-        sec = get_security(res)
+        sec = run(res)
+        self.assertEqual(sec["state"], -1)
+    def test_other_emtpy(self):
+        res = {"type":"aws_other_bucket", "instances":[] }
+        sec = run(res)
         self.assertEqual(sec["state"], -1)
 
 if __name__ == '__main__':

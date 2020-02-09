@@ -5,6 +5,7 @@
 .tfvars
 .vscode
 *.tfvars
+*.lock.info
 
 code/Jinja2*
 code/jinja2*

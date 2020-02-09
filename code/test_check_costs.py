@@ -1,5 +1,5 @@
 import unittest
-from lib_costs import get_montly_costs, get_costs
+from check_costs import get_montly_costs, run
 
 class test_get_montly_costs(unittest.TestCase):
     def test_daily(self):
@@ -22,15 +22,15 @@ class test_get_montly_costs(unittest.TestCase):
 class test_get_costs(unittest.TestCase):
     def test_kms(self):
         res = {"type":"aws_kms_key"}
-        costs = get_costs(res)
+        costs = run(res)
         self.assertEqual(costs, 1)
     def test_nat(self):
         res = {"type":"aws_nat_gateway"}
-        costs = get_costs(res)
+        costs = run(res)
         self.assertGreater(costs, 1)
     def test_undefined(self):
         res = {"type":"nothing_existing"}
-        costs = get_costs(res)
+        costs = run(res)
         self.assertEqual(costs, None)
 
 if __name__ == '__main__':
