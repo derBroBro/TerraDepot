@@ -52,6 +52,10 @@ Using custom domains is quite easy, just pass in the `domain` and `cert_arn` var
 The `cert_arn` must be a verfied ACM certificate in the us-east-1 region.
 After this you need to create a CNAME Record for your domain pointing to the API Gateways Endpoint. Details what to configure will be shown in the outputs.
 
+## Webhooks and Mails
+Changes on the config, as well as on the state will be pushed to an SNS topic created.  
+If you want to get informed, just create an fitting subscription.
+
 ## For each project
 Visit your https://yourdomain/project/new to create a new project.  
 After creation you will get to the overview of your project. On this you find also an `backend_http.tf` config which should be added to your projects.
@@ -59,19 +63,20 @@ After creation you will get to the overview of your project. On this you find al
 # Further opportunities
 There are a lot of extensions possible for this backend.
 Just some ideas:  
-- [ ] Trigger a central webhook for each state-change  
+- [x] Trigger a central webhook for each state-change  
 - [x] List and show all states on a central place 
 - [ ] Central state locking
 - [ ] Cost warnings (base is set. Baybe [lyft/awspricing](https://github.com/lyft/awspricing) is helpfull)
 - [ ] Security checks (public buckets etc.)
 - [ ] Pen-Test after state changes
-- [ ] Send a brief summary as a notification
+- [x] Send a brief summary as a notification
 
 # Todo
 - [x] Setup proper testing
 - [x] Setup basis auth instead of the key-based
 - [x] Add custom Domains
-- [ ] Add SNS to subscribe on changes
-- [ ] Generate report asynchronously (Required for notifications and pentests) 
+- [x] Add SNS to subscribe on changes
+- [x] Generate report asynchronously (Required for notifications and pentests) 
+- [ ] Add costs estimates for more and complex resource types
 
 
