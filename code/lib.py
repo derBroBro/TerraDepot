@@ -167,10 +167,18 @@ def gen_report(project_id):
     write_key(f"{project_id}/report.json", json.dumps(report,indent=4))
     return report
     
-def send_message(target_arn, message, subject=""):
+def send_message(target_arn, project_id, message, subject=""):
     logger.info(f"Send {subject}/{message} to {target_arn}")
     sns_client = boto3.client('sns')
-    result = sns_client.publish(TopicArn=target_arn, Message=message, Subject=subject)
+    payload = {
+        "default": message,
+        "email": message,
+        "sqs": message,
+        "lambda": project_id,
+        "http": project_id,
+        "https": project_id
+    }
+    result = sns_client.publish(TopicArn=target_arn, Message=json.dumps(payload), Subject=subject, MessageStructure="json")
     logger.info(result)
 
 def gen_test_project():

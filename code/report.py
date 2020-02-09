@@ -26,9 +26,13 @@ def lambda_handler(event, context):
     project_name = config["name"]
 
     if filename == "config.json":
-        send_message(CONFIG_TOPIC, f"{project_name} with id {project_id} has been crete or updated", f"Project {project_name} update" )
+        send_message(CONFIG_TOPIC, project_id, f"Project \"{project_name}\" ({project_id}) settings has been creted or updated", f"Project {project_name} update" )
     if filename == "terraform.tfstate":
         report = gen_report(project_id)
-        if report["state"] > 1:
-            send_message(STATE_TOPIC, f"{project_name} with id {project_id} has an critcal state, please check here https://{DOMAIN}/{project_id}/info", f"Project {project_name} has issues" )
+        state = "UNKNOWN"
+        if report["state"] == 1:
+            state = "WARNING"
+        if report["state"] == 2:
+            state = "CRITICAL"
+        send_message(STATE_TOPIC, project_id, f"Project \"{project_name}\" ({project_id}) was deployed is now in state {state},\nPlease check here https://{DOMAIN}/{project_id}/info for further details", f"[{state}] Project {project_name} was deployed" )
         
