@@ -2,16 +2,21 @@ import json
 import logging
 import os
 import base64
-from lib import create_response, randomString, write_key, read_key_or_default, get_config
+from lib import (
+    create_response,
+    randomString,
+    write_key,
+    read_key_or_default,
+    get_config,
+)
 
 logger = logging.getLogger()
-logger.setLevel(os.environ.get('LOG_LEVEL','INFO'))
+logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 KEY = os.environ.get("KEY")
 
 
 def lambda_handler(event, context):
-
 
     logger.info(event)
     logger.info(context)
@@ -35,13 +40,13 @@ def lambda_handler(event, context):
             return create_policy(auth_user, arn, "Allow")
         else:
             logger.warn("Admin key does not fit, reject")
-            raise Exception('Unauthorized')
+            raise Exception("Unauthorized")
 
     # for state or info use the key from the project
     if event["resource"] == "/project/{projectId}/terraform.tfstate":
         logger.info("Got request for info or state")
         if auth_user == "token":
-            project_id = event["pathParameters"]["projectId"]    
+            project_id = event["pathParameters"]["projectId"]
             logger.info(f"Got request for project {project_id}")
             config = get_config(project_id)
             project_name = config["name"]
@@ -52,26 +57,21 @@ def lambda_handler(event, context):
                 return create_policy(project_id, arn, "Allow")
             else:
                 logger.warn("Token does not fit, reject")
-                raise Exception('Unauthorized')
+                raise Exception("Unauthorized")
 
     logger.error("Got invalid request, Deny")
-    raise Exception('Unauthorized')
+    raise Exception("Unauthorized")
 
-   
 
 def create_policy(principalId, apiArn, effect="Deny"):
     policy = {
         "principalId": principalId,
         "policyDocument": {
-            "Version": '2012-10-17',
+            "Version": "2012-10-17",
             "Statement": [
-                {
-                    "Action": 'execute-api:Invoke',
-                    "Effect": effect,
-                    "Resource": [apiArn]
-                }
-            ]
-        }
+                {"Action": "execute-api:Invoke", "Effect": effect, "Resource": [apiArn]}
+            ],
+        },
     }
     logger.info(policy)
     return policy

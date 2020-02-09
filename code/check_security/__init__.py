@@ -4,6 +4,7 @@ from .lib import *
 
 logger = logging.getLogger()
 
+
 def run(resource):
     tests = []
     try:
