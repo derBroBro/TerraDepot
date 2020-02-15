@@ -9,15 +9,14 @@ setup_s3()
 
 
 from state import lambda_handler
-from lib import read_key_or_default, new_project, read_file, get_tf_metadata
+from lib import read_key_or_default, new_project, read_file, get_tf_metadata, gen_test_project
 
 
 @mock_s3
 class test_lambda_handler(unittest.TestCase):
     def test_request_get(self):
         # create project
-        project_id = new_project(name="test", owner="test@test.de", token="test123")
-
+        project_id = gen_test_project()
         # get state
         event = {
             "httpMethod": "GET",
@@ -40,7 +39,7 @@ class test_lambda_handler(unittest.TestCase):
 
     def test_request_post(self):
         # create project
-        project_id = new_project(name="test", owner="test@test.de", token="test123")
+        project_id = gen_test_project()
 
         # post state
         raw_tf = read_file("test_data/terraform.teststate")
@@ -60,7 +59,7 @@ class test_lambda_handler(unittest.TestCase):
 
     def test_request_post_invalid(self):
         # create project
-        project_id = new_project(name="test", owner="test@test.de", token="test123")
+        project_id = gen_test_project()
 
         # post state
         event = {

@@ -9,14 +9,14 @@ setup_s3()
 
 
 from info import lambda_handler
-from lib import read_key_or_default, new_project, gen_report, read_file, write_key
+from lib import read_key_or_default, new_project, gen_report, read_file, write_key, gen_test_project
 
 
 @mock_s3
 class test_lambda_handler(unittest.TestCase):
     def test_request_get(self):
         # create project
-        project_id = new_project(name="test", owner="test@test.de", token="test123")
+        project_id = gen_test_project()
         tf_raw_state = read_file("test_data/terraform.teststate")
         write_key(f"{project_id}/terraform.tfstate", tf_raw_state)
         report = gen_report(project_id)

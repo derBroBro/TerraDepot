@@ -16,7 +16,7 @@ class test_lambda_handler(unittest.TestCase):
     def test_request_post_complete(self):
         event = {
             "httpMethod": "POST",
-            "body": "name=test&owner=test%40test.de&token=test",
+            "body": "name=test&owner=test%40test.de",
         }
         result = lambda_handler(event, {})
         self.assertEqual(result["statusCode"], 301)
@@ -27,15 +27,16 @@ class test_lambda_handler(unittest.TestCase):
         self.assertEqual(config["name"], "test")
 
     def test_request_post_incomplete(self):
-        event = {"httpMethod": "POST", "body": "name=test&token=test"}
+        event = {"httpMethod": "POST", "body": "name=test"}
         result = lambda_handler(event, {})
         self.assertEqual(result["statusCode"], 500)
 
     def test_request_get(self):
         event = {"httpMethod": "GET"}
         result = lambda_handler(event, {})
-        print(result["body"])
+        body = result["body"]
         self.assertEqual(result["statusCode"], 200)
+        self.assertTrue(body.startswith("<!doctype"))
 
 
 if __name__ == "__main__":

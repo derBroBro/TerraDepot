@@ -21,6 +21,8 @@ from lib import (
     get_config,
     render_template,
     gen_report,
+    get_report,
+    get_reports,
     gen_test_project,
 )
 
@@ -140,7 +142,7 @@ class test_get_post_parameter(unittest.TestCase):
 class test_new_project(unittest.TestCase):
     def test_create(self):
         project_id = new_project(
-            name="test", owner="test@test.de", token="elkaj3dlka3jdla3jd"
+            name="test", owner="test@test.de"
         )
         raw_tf = read_key_or_default(f"{project_id}/terraform.tfstate", "EMPTY")
         config = get_config(project_id)
@@ -151,9 +153,7 @@ class test_new_project(unittest.TestCase):
 @mock_s3
 class test_get_config(unittest.TestCase):
     def test_load(self):
-        project_id = new_project(
-            name="test", owner="test@test.de", token="elkaj3dlka3jdla3jd"
-        )
+        project_id = gen_test_project()
         config = get_config(project_id)
         self.assertEqual(config["name"], "test")
 
@@ -164,7 +164,7 @@ class test_get_config(unittest.TestCase):
 
 class test_render_template(unittest.TestCase):
     def test_load(self):
-        output = render_template("templates/project_form.html", name="test")
+        output = render_template("project_form.html", name="test")
         self.assertTrue(output.startswith("<!doctype"))
 
 
@@ -180,6 +180,29 @@ class test_gen_report(unittest.TestCase):
 
         self.assertEqual(report["config"]["name"], "test")
         self.assertEqual(report_from_s3["config"]["name"], "test")
+
+@mock_s3
+class test_get_report(unittest.TestCase):
+    def test_report(self):
+        project_id = gen_test_project()
+
+        report = gen_report(project_id)
+        report_from_s3 = get_report(project_id)
+
+        self.assertEqual(report["config"]["name"], "test")
+        self.assertEqual(report_from_s3["config"]["name"], "test")
+
+@mock_s3
+class test_get_reports(unittest.TestCase):
+    def test_report(self):
+        project_id_1 = gen_test_project()
+        gen_report(project_id_1)
+        project_id_2 = gen_test_project()
+        gen_report(project_id_2)
+
+        reports = get_reports()
+
+        self.assertGreaterEqual(len(reports), 2)
 
 
 @mock_s3

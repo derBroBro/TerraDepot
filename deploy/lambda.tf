@@ -33,6 +33,14 @@ resource "aws_lambda_permission" "apigw_lambda_info" {
 
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
 }
+resource "aws_lambda_permission" "apigw_lambda_list" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_list.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
+}
 resource "aws_lambda_permission" "s3_lambda_report" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
@@ -120,6 +128,22 @@ resource "aws_lambda_function" "lambda_info" {
   function_name    = "${var.name}_info"
   role             = aws_iam_role.lambda_exec.arn
   handler          = "info.lambda_handler"
+  runtime          = "python3.6"
+  source_code_hash = data.archive_file.deploy_pkg.output_base64sha256
+
+  environment {
+    variables = {
+      S3_BUCKET = aws_s3_bucket.state_bucket.id
+      DOMAIN    = var.domain
+      LOG_LEVEL = "INFO"
+    }
+  }
+}
+resource "aws_lambda_function" "lambda_list" {
+  filename         = "deploy_pkg.zip"
+  function_name    = "${var.name}_list"
+  role             = aws_iam_role.lambda_exec.arn
+  handler          = "list.lambda_handler"
   runtime          = "python3.6"
   source_code_hash = data.archive_file.deploy_pkg.output_base64sha256
 

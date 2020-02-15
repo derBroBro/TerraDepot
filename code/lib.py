@@ -4,7 +4,7 @@ import logging
 import boto3
 import botocore
 from datetime import datetime
-from jinja2 import Template
+from jinja2 import FileSystemLoader, Environment
 import os
 import json
 import urllib.parse
@@ -16,7 +16,7 @@ logger = logging.getLogger()
 
 BUCKET = os.environ.get("S3_BUCKET")
 DEFAULT_STATE = "templates/default.tfstate.template"
-VERSION = "1.0.0"
+VERSION = "0.1.0"
 
 
 def randomString(stringLength=10):
@@ -127,8 +127,9 @@ def get_post_parameter(event):
     return body_vars
 
 
-def new_project(name, owner, token):
+def new_project(name, owner):
     project_id = randomString(48)
+    token = randomString(24)
     config = json.dumps({"name": name, "owner": owner, "token": token})
     state = read_file(DEFAULT_STATE)
 
@@ -149,9 +150,10 @@ def get_config(project_id):
 
 
 def render_template(template_file, **kwargs):
-    raw_template = read_file(template_file)
-    template = Template(raw_template)
-    result = template.render(kwargs, verion=VERSION)
+    templateLoader = FileSystemLoader(searchpath=f"./templates")
+    templateEnv = Environment(loader=templateLoader)
+    template = templateEnv.get_template(template_file)
+    result = template.render(kwargs, version=VERSION)
     return result
 
 
@@ -171,6 +173,25 @@ def gen_report(project_id):
 
     write_key(f"{project_id}/report.json", json.dumps(report, indent=4))
     return report
+
+def get_report(project_id):
+    report_path = f"{project_id}/report.json"
+    report = json.loads(read_key_or_default(report_path, "{}"))
+    return report
+
+def get_reports():
+    result = []
+    s3_client = boto3.client("s3")
+    projects = s3_client.list_objects_v2(Bucket=BUCKET)
+    for project in projects["Contents"]:
+        key_path = project["Key"]
+        if(key_path.endswith("/report.json")):
+            project_id = key_path.replace("/report.json","")
+            project_report = get_report(project_id)
+            result.append(project_report)
+            logger.info("add report")
+    logger.info(result)
+    return result
 
 
 def send_message(target_arn, project_id, message, subject=""):
@@ -194,7 +215,7 @@ def send_message(target_arn, project_id, message, subject=""):
 
 
 def gen_test_project():
-    project_id = new_project(name="test", owner="test@test.de", token="test123")
+    project_id = new_project(name="test", owner="test@test.de")
     tf_raw_state = read_file("test_data/terraform.teststate")
     write_key(f"{project_id}/terraform.tfstate", tf_raw_state)
     return project_id

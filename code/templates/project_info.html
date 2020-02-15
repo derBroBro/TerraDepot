@@ -1,147 +1,117 @@
-<!doctype html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Project {{report.config.name}}{% endblock %}
+{% block content %}
+<div class="container">
+        <div class="row mt-5">
+            <div class="col-md-12">
+                    <p class="text-right"><a href="/project/new?key=replaceme">New Project</a></p>
+                <h1>Project {{report.config.name}}</h1>
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <title>Project {{report.config.name}}</title>
-</head>
-
-<body>
-        <div class="container">
-                <div class="row mt-5">
-                    <div class="col-md-12">
-                            <p class="text-right"><a href="/project/new?key=replaceme">New Project</a></p>
-                        <h1>Project {{report.config.name}}</h1>
-
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-md-12">
+                <div class="card">
+                    <h5 class="card-header">General</h5>
+                    <div class="card-body">                                  
+                        Terraform Serial: {{report.metadata.serial}}<br>
+                        Owner: {{report.config.owner}}<br>
+                        Last update: {{report.last_update}}<br>
+                        State: 
+                            {% if report.state == -1 -%}
+                                <i class="fa fa-question-circle text-muted"></i>
+                            {% endif -%}
+                            {% if report.state == 0 -%}
+                                <i class="fa fa-times-circle text-success"></i>
+                            {% endif -%}
+                            {% if report.state == 1 -%}
+                                <i class="fa fa-exclamation-triangle text-warning"></i>
+                            {% endif -%}
+                            {% if report.state == 2 -%}
+                                <i class="fa fa-times-circle text-danger"></i>
+                            {% endif -%}<br>
+                        The raw state can be found <a href="https://{{domain}}/project/{{project_id}}/terraform.tfstate">here</a>
                     </div>
                 </div>
-                <div class="row mt-1">
+            </div>
+        </div>
+        <div class="row mt-2">
+                <div class="col-md-12">
+                    <div class="card">
+                        <h5 class="card-header">Resources</h5>
+                        <div class="card-body"> 
+                                <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                        <th scope="col">Mobule</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Costs</th>
+                                        <th scope="col">Security</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for resource in report.resources %}
+                                        <tr>
+                                            <td scope="row">{{resource.module}}</td>
+                                            <td>
+                                                {{resource.type}}
+                                            </td>
+                                            <td>
+                                                {{ resource.name }}
+                                            </td>
+                                            <td>
+                                                {% if resource.costs != None %}
+                                                    {{resource.costs}} USD
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if resource.security.state == -1 -%}
+                                                    <i class="fa fa-question-circle text-muted"></i>
+                                                {% endif -%}
+                                                {% if resource.security.state == 0 -%}
+                                                    <i class="fa fa-times-circle text-success"></i>
+                                                {% endif -%}
+                                                {% if resource.security.state == 1 -%}
+                                                    <i class="fa fa-exclamation-triangle text-warning"></i>
+                                                {% endif -%}
+                                                {% if resource.security.state == 2 -%}
+                                                    <i class="fa fa-times-circle text-danger"></i>
+                                                {% endif -%}
+                                                {% for test in resource.security.tests -%}
+                                                    {{test.message}}
+                                                {% endfor -%}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
                     <div class="col-md-12">
                         <div class="card">
-                            <h5 class="card-header">General</h5>
+                            <h5 class="card-header">Usage</h5>
                             <div class="card-body">                                  
-                                Terraform Serial: {{report.metadata.serial}}<br>
-                                Owner: {{report.config.owner}}<br>
-                                Last update: {{report.last_update}}<br>
-                                State: 
-                                    {% if report.state == -1 -%}
-                                        <i class="fa fa-question-circle text-muted"></i>
-                                    {% endif -%}
-                                    {% if report.state == 0 -%}
-                                        <i class="fa fa-times-circle text-success"></i>
-                                    {% endif -%}
-                                    {% if report.state == 1 -%}
-                                        <i class="fa fa-exclamation-triangle text-warning"></i>
-                                    {% endif -%}
-                                    {% if report.state == 2 -%}
-                                        <i class="fa fa-times-circle text-danger"></i>
-                                    {% endif -%}<br>
-                                The raw state can be found <a href="https://{{domain}}/project/{{project_id}}/terraform.tfstate">here</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <h5 class="card-header">Resources</h5>
-                                <div class="card-body"> 
-                                        <div class="table-responsive">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                <th scope="col">Mobule</th>
-                                                <th scope="col">Type</th>
-                                                <th scope="col">Name</th>
-                                                <th scope="col">Costs</th>
-                                                <th scope="col">Security</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for resource in report.resources %}
-                                                <tr>
-                                                    <td scope="row">{{resource.module}}</td>
-                                                    <td>
-                                                        {{resource.type}}
-                                                    </td>
-                                                    <td>
-                                                        {{ resource.name }}
-                                                    </td>
-                                                    <td>
-                                                        {% if resource.costs != None %}
-                                                            {{resource.costs}} USD
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>
-                                                        {% if resource.security.state == -1 -%}
-                                                            <i class="fa fa-question-circle text-muted"></i>
-                                                        {% endif -%}
-                                                        {% if resource.security.state == 0 -%}
-                                                            <i class="fa fa-times-circle text-success"></i>
-                                                        {% endif -%}
-                                                        {% if resource.security.state == 1 -%}
-                                                            <i class="fa fa-exclamation-triangle text-warning"></i>
-                                                        {% endif -%}
-                                                        {% if resource.security.state == 2 -%}
-                                                            <i class="fa fa-times-circle text-danger"></i>
-                                                        {% endif -%}
-                                                        {% for test in resource.security.tests -%}
-                                                            {{test.message}}
-                                                        {% endfor -%}
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>    
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <h5 class="card-header">Usage</h5>
-                                    <div class="card-body">                                  
-                                        <pre class="bg-dark text-light">
-                                            <code>
+                                <pre class="bg-dark text-light">
+                                    <code>
 {% raw %}terraform {
-    backend "http" {{% endraw %}
+backend "http" {{% endraw %}
         address = "https://{{domain}}/project/{{project_id}}/terraform.tfstate"
         username = "token"
         password = "{{report.config.token}}"{% raw %}
     }
 }{% endraw %}
-                                            </code>
-                                        </pre>
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        &copy; 2020 Malte Brodersen - Find more on <a href="https://github.com/derBroBro/terraform-http-backend">github</a>
-                                    </div>
-                                </div>
+                                    </code>
+                                </pre>
                             </div>
+                            {% include 'footer.html' %}
                         </div>
-            </div>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
-</body>
-
-</html>
+                    </div>
+                </div>
+    </div>
+{% endblock %}

@@ -67,6 +67,17 @@ resource "aws_api_gateway_method" "method_info" {
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.auth.id
 }
+resource "aws_api_gateway_method" "method_list" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.project.id
+  http_method = "ANY"
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.auth.id
+}
 
 ## Integration
 resource "aws_api_gateway_integration" "integration_state" {
@@ -93,6 +104,14 @@ resource "aws_api_gateway_integration" "integration_info" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_info.invoke_arn
 }
+resource "aws_api_gateway_integration" "integration_list" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.project_list.id
+  http_method             = aws_api_gateway_method.method_new.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambda_list.invoke_arn
+}
 
 
 ## Deployment
@@ -100,6 +119,7 @@ resource "aws_api_gateway_deployment" "prod" {
   depends_on = [
     "aws_api_gateway_integration.integration_state",
     "aws_api_gateway_integration.integration_info",
+    "aws_api_gateway_integration.integration_list",
     "aws_api_gateway_integration.integration_new",
     "aws_api_gateway_authorizer.auth"
   ]
