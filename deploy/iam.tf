@@ -17,19 +17,15 @@ resource "aws_iam_policy" "s3_policy" {
         {
             "Effect": "Allow",
             "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:ListObjectsV2",
+                "s3:ListObjects",
+                "s3:DeleteObject",
                 "s3:ListBucket",
                 "s3:GetBucketLocation"
             ],
-            "Resource": "arn:aws:s3:::${aws_s3_bucket.state_bucket.arn}"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:DeleteObject"
-            ],
-            "Resource": "${aws_s3_bucket.state_bucket.arn}/*"
+            "Resource": ["${aws_s3_bucket.state_bucket.arn}/*", "${aws_s3_bucket.state_bucket.arn}"]
         }
     ]
 }

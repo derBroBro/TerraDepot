@@ -99,15 +99,15 @@ resource "aws_api_gateway_integration" "integration_new" {
 resource "aws_api_gateway_integration" "integration_info" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.project_info.id
-  http_method             = aws_api_gateway_method.method_new.http_method
+  http_method             = aws_api_gateway_method.method_info.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_info.invoke_arn
 }
 resource "aws_api_gateway_integration" "integration_list" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.project_list.id
-  http_method             = aws_api_gateway_method.method_new.http_method
+  resource_id             = aws_api_gateway_resource.project.id
+  http_method             = aws_api_gateway_method.method_list.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_list.invoke_arn

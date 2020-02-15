@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}List Projects{% endblock %}
+{% block content %}
+<div class="container">
+        <div class="row mt-5">
+            <div class="col-md-12">
+                    <p class="text-right"><a href="/project/new?key=replaceme">New Project</a></p>
+                <h1>Projects</h1>
+
+            </div>
+        </div>
+        <div class="row mt-2">
+                <div class="col-md-12">
+                    <div class="card">
+                        <h5 class="card-header">Usage</h5>
+                        <div class="card-body">   
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Owner</th>
+                                    <th scope="col">Last Update</th>
+                                    <th scope="col">State</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                {% for report in reports %}
+                                  <tr>
+                                    <th><a href="/project/{{report.id}}/info">{{report.config.name}}</a><br><small>{{report.id}}</small></th>
+                                    <td>{{report.config.owner}}</td>
+                                    <td>{{report.last_update}}</td>
+                                    <td>{% if report.state == -1 -%}
+                                        <i class="fa fa-question-circle text-muted"></i>
+                                    {% endif -%}
+                                    {% if report.state == 0 -%}
+                                        <i class="fa fa-times-circle text-success"></i>
+                                    {% endif -%}
+                                    {% if report.state == 1 -%}
+                                        <i class="fa fa-exclamation-triangle text-warning"></i>
+                                    {% endif -%}
+                                    {% if report.state == 2 -%}
+                                        <i class="fa fa-times-circle text-danger"></i>
+                                    {% endif -%}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                        </div>
+                        {% include 'footer.html' %}
+                    </div>
+                </div>
+            </div>
+    </div>
+{% endblock %}

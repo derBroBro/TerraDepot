@@ -69,7 +69,11 @@ def get_tf_res(tf_state, is_raw=False):
         except:
             return []
     result = []
-    resources = tf_state["resources"]
+
+    resources = []
+    if "resources" in resources:
+        tf_state["resources"]
+        
     for res in resources:
         if res["mode"] == "managed":
             name = res["name"]
@@ -185,9 +189,13 @@ def get_reports():
     projects = s3_client.list_objects_v2(Bucket=BUCKET)
     for project in projects["Contents"]:
         key_path = project["Key"]
-        if(key_path.endswith("/report.json")):
-            project_id = key_path.replace("/report.json","")
+        if(key_path.endswith("/config.json")):
+            project_id = key_path.replace("/config.json","")
             project_report = get_report(project_id)
+            if not "config" in project_report:
+                project_report = gen_report(project_id)
+
+            project_report["id"] = project_id
             result.append(project_report)
             logger.info("add report")
     logger.info(result)
