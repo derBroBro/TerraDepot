@@ -7,6 +7,7 @@ And yes - you are right the is something similar but also different as this appr
 - [x] Offer a Webinterface for creation of backends
 - [x] Inspect the state of each project in a webui
 - [x] Offer a diffrent token for each new Project
+- [x] List projects as admin
 - [ ] Show if the project fulfills the security requirements of your organistation
 - [ ] The an cost estimate based on the used ressources
 
